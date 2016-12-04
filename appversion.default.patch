@@ -1,0 +1,7 @@
+--- org/appversion.default	2016-11-10 16:44:33.000000000 +0100
++++ mod/appversion.default	2016-11-13 09:31:50.216953063 +0100
+@@ -1,3 +1,3 @@
+-#define APPVERSION 5876
++#define APPVERSION 5877
+ #define APPHASH "b97777b"
+ #define APPDATE 1478691222

@@ -1,0 +1,29 @@
+--- org/CMakeLists.txt	2016-11-10 16:44:33.000000000 +0100
++++ mod/CMakeLists.txt	2016-11-13 09:28:04.299984751 +0100
+@@ -517,7 +517,7 @@
+ #ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ 
+ # try to find open-zwave, if found, include support
+-option(USE_STATIC_OPENZWAVE "Build with static OpenZwave libraries" YES)
++option(USE_STATIC_OPENZWAVE "Build with static OpenZwave libraries" NO)
+ if(USE_STATIC_OPENZWAVE)
+   find_library(OpenZWave NAMES libopenzwave.a HINTS "../open-zwave-read-only" "../open-zwave-read-only/cpp/build")
+   set(OPENZWAVE_LIB ${OpenZWave})
+@@ -641,7 +641,7 @@
+ 
+ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
+ SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
+-SET(CPACK_PACKAGE_DEFAULT_LOCATION "/opt/${CPACK_PACKAGE_NAME}")
++SET(CPACK_PACKAGE_DEFAULT_LOCATION "/usr/share/${CPACK_PACKAGE_NAME}")
+ SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
+ 
+ #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
+@@ -650,7 +650,7 @@
+ INCLUDE(CPack)
+ 
+ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+-  set(CMAKE_INSTALL_PREFIX "/opt/${CPACK_PACKAGE_NAME}" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
++  set(CMAKE_INSTALL_PREFIX "/usr/share/${CPACK_PACKAGE_NAME}" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+ ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+ 
+ install(TARGETS domoticz DESTINATION ${CMAKE_INSTALL_PREFIX})
