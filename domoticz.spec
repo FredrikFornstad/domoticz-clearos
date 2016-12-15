@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	3.5877
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -172,6 +172,9 @@ getent group %{name} >/dev/null || groupadd -r %{name}
 getent passwd %{name} >/dev/null || useradd -r -g %{name} -d /usr/share/%{name} -s /sbin/nologin -c "Domoticz Daemon" %{name}
 
 %post
+if [ $1 -gt 1 ]; then
+systemctl try-restart domoticz &> /dev/null || :
+fi
 
 %preun
 
@@ -183,5 +186,8 @@ getent passwd %{name} >/dev/null || useradd -r -g %{name} -d /usr/share/%{name} 
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Thu Dec 15 2016 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-2
+- Added a try-restart in case of upgrade and system has daemon script installed
+
 * Sat Nov 19 2016 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-1
 - First build for ClearOS
