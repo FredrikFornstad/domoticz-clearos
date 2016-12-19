@@ -1,0 +1,45 @@
+From 42e7869f411a75512fb6994c634eb086fb9eb5cc Mon Sep 17 00:00:00 2001
+From: Christopher Kohlhoff <chris@kohlhoff.com>
+Date: Sun, 11 Sep 2016 12:04:18 +1000
+Subject: [PATCH] Fix allocator usage to compile with g++ 6.
+
+---
+ include/boost/asio/impl/use_future.hpp | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/include/boost/asio/impl/use_future.hpp b/include/boost/asio/impl/use_future.hpp
+index b954e14..92106f4 100644
+--- a/include/boost/asio/impl/use_future.hpp
++++ b/include/boost/asio/impl/use_future.hpp
+@@ -34,10 +34,12 @@ namespace detail {
+   {
+   public:
+     // Construct from use_future special value.
+-    template <typename Allocator>
+-    promise_handler(use_future_t<Allocator> uf)
++    template <typename Alloc>
++    promise_handler(use_future_t<Alloc> uf)
+       : promise_(std::allocate_shared<std::promise<T> >(
+-            uf.get_allocator(), std::allocator_arg, uf.get_allocator()))
++            typename Alloc::template rebind<char>::other(uf.get_allocator()),
++            std::allocator_arg,
++            typename Alloc::template rebind<char>::other(uf.get_allocator())))
+     {
+     }
+ 
+@@ -66,10 +68,12 @@ namespace detail {
+   {
+   public:
+     // Construct from use_future special value. Used during rebinding.
+-    template <typename Allocator>
+-    promise_handler(use_future_t<Allocator> uf)
++    template <typename Alloc>
++    promise_handler(use_future_t<Alloc> uf)
+       : promise_(std::allocate_shared<std::promise<void> >(
+-            uf.get_allocator(), std::allocator_arg, uf.get_allocator()))
++            typename Alloc::template rebind<char>::other(uf.get_allocator()),
++            std::allocator_arg,
++            typename Alloc::template rebind<char>::other(uf.get_allocator())))
+     {
+     }
+ 

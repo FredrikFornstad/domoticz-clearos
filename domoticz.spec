@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	3.5877
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -10,6 +10,7 @@ URL:		http://www.domoticz.com
 Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
 Source1:	http://downloads.sourceforge.net/boost/boost_%{boostver}.tar.bz2
 Source2: 	ver.py
+Source3:        libboost_thread.so
 
 Patch1:		CMakeLists.txt.patch
 Patch2:		download_update.sh.patch
@@ -55,6 +56,12 @@ Patch21: boost-1.60-multiprecision.patch
 # https://github.com/boostorg/python/pull/59/files
 Patch22: boost-1.60-python-regptr.patch
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=1318383
+Patch23: boost-1.60.0-no-rpath.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1403165
+Patch24: boost-1.60-asio-use-future.patch
+
 BuildRequires:	make cmake gcc gcc-c++
 BuildRequires:	openssl-devel git
 BuildRequires:	curl-devel libquadmath-devel
@@ -65,9 +72,11 @@ BuildRequires: m4 libquadmath-devel
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
-BuildRequires: python-devel
+BuildRequires: python-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
+
+Requires: python python34
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -97,11 +106,16 @@ cd boost_%{boostver}
 %patch20 -p2
 %patch21 -p2
 %patch22 -p2
+%patch23 -p0
+%patch24 -p2
 
-%global python2_version %(/usr/bin/python2 %{SOURCE2})
 cd ..
 
 %build
+
+%global python2_version %(/usr/bin/python2 %{SOURCE2})
+%global python3_version %(/usr/bin/python3 %{SOURCE2})
+%global python3_abiflags %(/usr/bin/python3-config --abiflags)
 
 #
 # The boost version in ClearOS 7 is too old. We therefore build a more modern version of boost
@@ -110,6 +124,8 @@ cd ..
 
 cd boost_%{boostver}
 : PYTHON2_VERSION=%{python2_version}
+: PYTHON3_VERSION=%{python3_version}
+: PYTHON3_ABIFLAGS=%{python3_abiflags}
 
 # There are many strict aliasing warnings, and it's not feasible to go
 # through them all at this time.
@@ -121,6 +137,10 @@ import os ;
 local RPM_OPT_FLAGS = [ os.environ RPM_OPT_FLAGS ] ;
 
 using gcc : : : <compileflags>$(RPM_OPT_FLAGS) ;
+
+using python : %{python2_version} : /usr/bin/python2 : /usr/include/python%{python2_version} : : : : ;
+using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}%{python3_abiflags} : : : : %{python3_abiflags} ;
+
 EOF
 
 ./bootstrap.sh --with-toolset=gcc --with-icu
@@ -150,6 +170,9 @@ if [ $(find serial -type f -name has_atomic_flag_lockfree \
 else
         DEF=U
 fi
+
+m4 -${DEF}HAS_ATOMIC_FLAG_LOCKFREE -DVERSION=%{boost_ver} \
+        %{SOURCE3} > $(basename %{SOURCE3})
 
 echo ============================= build Boost.Build ==================
 (cd tools/build
@@ -186,6 +209,11 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun Dec 18 2016 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-3
+- Added patch for python RPATH (bugzilla 1318383)
+- Added patch for Boost.Asio to fix allocator usage (bugzilla 1403165)
+- Prepared for Python 3 support
+
 * Thu Dec 15 2016 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-2
 - Added a try-restart in case of upgrade and system has daemon script installed
 
