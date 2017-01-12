@@ -1,0 +1,11 @@
+--- org/scripts/restart_domoticz	2016-11-10 16:44:33.000000000 +0100
++++ mod/scripts/restart_domoticz	2016-12-25 22:26:11.276449439 +0100
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ 
+-sudo service domoticz.sh stop
++sudo service domoticz stop
+ echo "please standby... (waiting 8 seconds)"
+ sleep 8
+-sudo service domoticz.sh start
++sudo service domoticz start

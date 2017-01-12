@@ -1,0 +1,17 @@
+--- org/www/views/setup.html	2016-11-10 16:44:33.000000000 +0100
++++ mod/www/views/setup.html	2017-01-06 13:43:32.613093774 +0100
+@@ -202,13 +202,12 @@
+ 										<h2><span data-i18n="SoftwareUpdates"></span>:</h2>
+ 										<table class="display" id="autoupdatetable" border="0" cellpadding="0" cellspacing="0">
+ 											<tr>
+-												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"/> <span data-i18n="CheckForSoftwareUpdates"></span></td>
++												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"/> <span data-i18n="CheckForSoftwareUpdates"></span> (Not working in ClearOS)</td>
+ 											</tr>
+ 											<tr>
+ 												<td align="right" style="width:130px"><label><span data-i18n="Release Channel">Release Channel</span>: </label></td>
+ 												<td><select id="comboReleaseChannel" name="ReleaseChannel" style="width:140px" class="combobox ui-corner-all">
+ 													<option data-i18n="Stable" value="0">Stable</option>
+-													<option data-i18n="Beta" value="1">Beta</option>
+ 												</select></td>
+ 											</tr>
+ 										</table>

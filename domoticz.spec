@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	3.5877
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -11,12 +11,17 @@ Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
 Source1:	http://downloads.sourceforge.net/boost/boost_%{boostver}.tar.bz2
 Source2: 	ver.py
 Source3:        libboost_thread.so
+Source4:	readme.txt
+Source5:	run-domoticz
 
 Patch1:		CMakeLists.txt.patch
 Patch2:		download_update.sh.patch
 Patch3:		update_domoticz.patch
 Patch4:		updatedomo.patch
 Patch5:		appversion.default.patch
+Patch6:		setup.html.patch
+Patch7:		index.html.patch
+Patch8:		restart_domoticz.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch10: boost-1.50.0-fix-non-utf8-files.patch
@@ -80,7 +85,7 @@ Requires: python python34
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
-Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Electra, Gas, Water and much more.
+Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Electricity, Gas, Water and much more.
 Notifications/Alerts can be sent to any mobile device.
 
 %prep
@@ -90,6 +95,9 @@ Notifications/Alerts can be sent to any mobile device.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 tar -vxjf %{SOURCE1}
 cd boost_%{boostver}
@@ -179,7 +187,7 @@ echo ============================= build Boost.Build ==================
  ./bootstrap.sh --with-toolset=gcc)
 
 #
-# Time to build domoticz
+# Boost is prepared, move on to build domoticz
 #
 
 cd ..
@@ -189,15 +197,26 @@ make
 
 %install
 %make_install
+%{__install} -m0644 %{SOURCE4} ${RPM_BUILD_ROOT}%{_datadir}/%{name}/readme.txt
+%{__install} -m0754 %{SOURCE5} ${RPM_BUILD_ROOT}%{_datadir}/%{name}/run-domoticz
+mkdir -m 775 -p ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}
+chmod 775 ${RPM_BUILD_ROOT}%{_datadir}/%{name}
+chmod 754 ${RPM_BUILD_ROOT}%{_datadir}/%{name}/%{name}
+mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/scripts ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/
+mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/www ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/
+mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/*.pem ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/
+rm -rf ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/scripts/logrotate*
 
 %pre
 getent group %{name} >/dev/null || groupadd -r %{name}
-getent passwd %{name} >/dev/null || useradd -r -g %{name} -d /usr/share/%{name} -s /sbin/nologin -c "Domoticz Daemon" %{name}
+getent passwd %{name} >/dev/null || useradd -r -g %{name} -d %{_datadir}/%{name} -s /sbin/nologin -c "Domoticz Daemon" %{name}
 
 %post
 if [ $1 -gt 1 ]; then
 systemctl try-restart domoticz &> /dev/null || :
 fi
+chown %{name}.webconfig /var/domoticz
+chmod 775 /var/domoticz
 
 %preun
 
@@ -206,9 +225,18 @@ fi
 %files
 %doc History.txt
 %license License.txt
+%attr(-,%{name},%{name}) %{_localstatedir}/%{name}
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Thu Jan 12 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-4
+- Changed installation directories after feedback from ClearOS QA Audit
+- Added readme.txt to assist end users
+- Added script to run domoticz manually
+- Made localstatedir writable for webconfig
+- Added patch to hide Check for Update
+- Added patch to correct domoticz native restart script
+
 * Sun Dec 18 2016 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-3
 - Added patch for python RPATH (bugzilla 1318383)
 - Added patch for Boost.Asio to fix allocator usage (bugzilla 1403165)
