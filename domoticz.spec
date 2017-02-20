@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	3.5877
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -251,6 +251,9 @@ systemctl try-restart domoticz &> /dev/null || :
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Mon Feb 20 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-6
+- Corrected argument in run-domoticz script
+
 * Sun Jan 15 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-5
 - Excluded the bundled Z-wave config directory and added a soft link to libopenzwave config directory instead
 - Remove /usr/share/domoticz at uninstall

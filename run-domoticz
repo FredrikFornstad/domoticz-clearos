@@ -1,4 +1,4 @@
 #!/bin/sh
 
-su -s /bin/sh -c "/usr/share/domoticz/domoticz -wwwroot /var/domoticz/www -dbase /var/domoticz/domoticz.db -userdata /var/domoticz/ -sslcert /var/domoticz/server_cert.pem -ssldhparm /var/domoticz/server_cert.pem" domoticz
+su -s /bin/sh -c "/usr/share/domoticz/domoticz -wwwroot /var/domoticz/www -dbase /var/domoticz/domoticz.db -userdata /var/domoticz/ -sslcert /var/domoticz/server_cert.pem -ssldhparam /var/domoticz/server_cert.pem" domoticz
 
