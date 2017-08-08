@@ -1,13 +1,14 @@
---- org/scripts/download_update.sh	2016-11-10 16:44:33.000000000 +0100
-+++ mod/scripts/download_update.sh	2016-11-12 22:44:35.405165962 +0100
-@@ -1,50 +1,2 @@
+--- org/scripts/download_update.sh	2017-07-30 12:19:41.000000000 +0200
++++ mod/scripts/download_update.sh	2017-08-07 20:21:31.280489377 +0200
+@@ -1,50 +1,4 @@
  #!/bin/sh
 -cd $1
--
+ 
 -lowercase(){
 -    echo "$1" | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/"
 -}
--
++echo "Updating Domotics from the Domoticz dashboard does not work in ClearOS"
+ 
 -OS=`lowercase \`uname -s\``
 -# KERNEL=`uname -r`
 -MACH=`uname -m`
@@ -51,4 +52,3 @@
 -        exit 1;
 -  fi
 -fi
-+echo "Updating Domotics from the Domoticz dashboard does not work in ClearOS"

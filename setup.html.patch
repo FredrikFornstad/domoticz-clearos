@@ -1,6 +1,6 @@
---- org/www/views/setup.html	2016-11-10 16:44:33.000000000 +0100
-+++ mod/www/views/setup.html	2017-01-06 13:43:32.613093774 +0100
-@@ -202,13 +202,12 @@
+--- org/www/views/setup.html	2017-07-30 12:19:41.000000000 +0200
++++ mod/www/views/setup.html	2017-08-07 20:27:51.765856504 +0200
+@@ -207,13 +207,12 @@
  										<h2><span data-i18n="SoftwareUpdates"></span>:</h2>
  										<table class="display" id="autoupdatetable" border="0" cellpadding="0" cellspacing="0">
  											<tr>

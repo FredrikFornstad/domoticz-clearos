@@ -1,6 +1,6 @@
---- org/updatedomo	2016-11-10 16:44:33.000000000 +0100
-+++ mod/updatedomo	2016-11-12 23:18:49.283846761 +0100
-@@ -1,24 +1,6 @@
+--- org/updatedomo	2017-07-30 12:19:41.000000000 +0200
++++ mod/updatedomo	2017-08-07 20:19:42.120957841 +0200
+@@ -1,24 +1,5 @@
  #!/bin/sh
  
 -# This script can be used to upgrade/compile to the latest version
@@ -10,8 +10,7 @@
 -echo "Updating to server revision..."
 -git fetch --all
 -git reset --hard origin/master
-+echo "Update of Domoticz is done by yum update in ClearOS"
- 
+-
 -cmake -DCMAKE_BUILD_TYPE=Release .
 -if [ $? -ne 0 ]
 -then
@@ -27,3 +26,4 @@
 -# Restart domoticz
 -echo "Restarting Domoticz... (please standby...)"
 -sudo service domoticz.sh restart
++echo "Update of Domoticz is done by yum update in ClearOS"

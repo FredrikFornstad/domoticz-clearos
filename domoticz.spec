@@ -1,8 +1,8 @@
 %global boostver 1_60_0
 
 Name:		domoticz
-Version:	3.5877
-Release:	6%{?dist}
+Version:	3.8153
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -207,6 +207,7 @@ mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/www ${RPM_BUILD_ROOT}%{_localstatedir}/%
 mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/*.pem ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/
 rm -rf ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/scripts/logrotate*
 rm -rf ${RPM_BUILD_ROOT}%{_datadir}/%{name}/Config
+ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
 
 %pre
 getent group %{name} >/dev/null || groupadd -r %{name}
@@ -220,9 +221,9 @@ chown %{name}.webconfig /var/domoticz &> /dev/null || :
 chmod 775 /var/domoticz &> /dev/null || :
 chmod 775 /usr/share/open-zwave/config &> /dev/null || :
 chown -R root.%{name} /usr/share/open-zwave/config* &> /dev/null || :
-# if [ £1 -gt 1 ]; then
-# systemctl try-restart domoticz $> /dev/null || :
-# fi
+if [ $1 -gt 1 ]; then
+systemctl try-restart domoticz $> /dev/null || :
+fi
 
 %preun
 
@@ -232,18 +233,6 @@ rm -rf /usr/share/domoticz $> /dev/null || :
 fi
 
 
-
-
-# The posttrans is a one time fix to take care of the switch from the bundled content in Config directory to a soft link to libopenzwave
-# without having the old package deleting files in the new location due to the soft link. In future versions of Domoticz, the
-# softlink will be included in the install section and the try-restart in the post section
-
-%posttrans
-ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
-systemctl try-restart domoticz &> /dev/null || :
-
-
-
 %files
 %doc History.txt
 %license License.txt
@@ -251,6 +240,10 @@ systemctl try-restart domoticz &> /dev/null || :
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Mon Aug 7 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.8153-1
+- New upstream release
+- Remove one time fix for transition to softlinked config files
+
 * Mon Feb 20 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.5877-6
 - Corrected argument in run-domoticz script
 

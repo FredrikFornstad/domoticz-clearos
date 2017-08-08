@@ -1,5 +1,5 @@
---- org/scripts/restart_domoticz	2016-11-10 16:44:33.000000000 +0100
-+++ mod/scripts/restart_domoticz	2016-12-25 22:26:11.276449439 +0100
+--- org/scripts/restart_domoticz	2017-07-30 12:19:41.000000000 +0200
++++ mod/scripts/restart_domoticz	2017-08-07 20:22:14.376304429 +0200
 @@ -1,6 +1,6 @@
  #!/bin/sh
  
