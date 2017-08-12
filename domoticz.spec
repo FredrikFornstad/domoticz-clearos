@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	3.8153
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -81,7 +81,7 @@ BuildRequires: python-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
 
-Requires: python python34
+Requires: python python34 python34-devel
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -207,7 +207,6 @@ mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/www ${RPM_BUILD_ROOT}%{_localstatedir}/%
 mv ${RPM_BUILD_ROOT}%{_datadir}/%{name}/*.pem ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/
 rm -rf ${RPM_BUILD_ROOT}%{_localstatedir}/%{name}/scripts/logrotate*
 rm -rf ${RPM_BUILD_ROOT}%{_datadir}/%{name}/Config
-ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
 
 %pre
 getent group %{name} >/dev/null || groupadd -r %{name}
@@ -219,6 +218,7 @@ fi
 %post
 chown %{name}.webconfig /var/domoticz &> /dev/null || :
 chmod 775 /var/domoticz &> /dev/null || :
+ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
 chmod 775 /usr/share/open-zwave/config &> /dev/null || :
 chown -R root.%{name} /usr/share/open-zwave/config* &> /dev/null || :
 if [ $1 -gt 1 ]; then
@@ -240,6 +240,10 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sat Aug 12 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.8153-2
+- Corrected link to open-zwave
+- Added python34-devel requirement to avoid dynamic library load error on domoticz startup
+
 * Mon Aug 7 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.8153-1
 - New upstream release
 - Remove one time fix for transition to softlinked config files
