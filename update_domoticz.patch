@@ -1,14 +1,13 @@
---- org/scripts/update_domoticz	2017-07-30 12:19:41.000000000 +0200
-+++ mod/scripts/update_domoticz	2017-08-07 20:23:19.719024007 +0200
-@@ -1,28 +1,4 @@
+--- org/scripts/update_domoticz	2018-06-23 16:18:06.000000000 +0200
++++ mod/scripts/update_domoticz	2018-06-23 22:32:21.996031438 +0200
+@@ -1,28 +1,2 @@
  #!/bin/sh
 -cd $1
  
 -tar xfz update.tgz
 -rm update.tgz
 -rm update.tgz.sha256sum
-+echo "ClearOS platform will handle updates of Domoticz"
- 
+-
 -lowercase(){
 -    echo "$1" | sed "y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/"
 -}

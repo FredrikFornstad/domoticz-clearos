@@ -1,12 +1,11 @@
---- org/updatedomo	2017-07-30 12:19:41.000000000 +0200
-+++ mod/updatedomo	2017-08-07 20:19:42.120957841 +0200
-@@ -1,24 +1,5 @@
+--- org/updatedomo	2018-06-23 16:18:06.000000000 +0200
++++ mod/updatedomo	2018-06-23 22:27:11.991095273 +0200
+@@ -1,24 +1,3 @@
  #!/bin/sh
  
 -# This script can be used to upgrade/compile to the latest version
 -# Please not that all modifications on the original files are lost
-+# This script shall not be used in ClearOS
- 
+-
 -echo "Updating to server revision..."
 -git fetch --all
 -git reset --hard origin/master

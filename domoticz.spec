@@ -1,8 +1,8 @@
 %global boostver 1_60_0
 
 Name:		domoticz
-Version:	3.8153
-Release:	2%{?dist}
+Version:	4.9700
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -240,6 +240,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sat Jun 23 2018 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.9700-1
+- New upstream release
+
 * Sat Aug 12 2017 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 3.8153-2
 - Corrected link to open-zwave
 - Added python34-devel requirement to avoid dynamic library load error on domoticz startup
