@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	4.9700
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -240,6 +240,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun Jun 24 2018 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.9700-2
+- Patched html files to adopt to ClearOS environment
+
 * Sat Jun 23 2018 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.9700-1
 - New upstream release
 
