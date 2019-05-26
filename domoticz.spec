@@ -1,8 +1,8 @@
 %global boostver 1_60_0
 
 Name:		domoticz
-Version:	4.9700
-Release:	3%{?dist}
+Version:	4.10717
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -240,6 +240,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun May 26 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-1
+- New upstream release
+
 * Sat Jun 30 2018 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.9700-3
 - New build with updated libopenzwave
 

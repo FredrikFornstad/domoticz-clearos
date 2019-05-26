@@ -1,5 +1,5 @@
---- org/www/views/setup.html	2018-06-23 16:18:06.000000000 +0200
-+++ mod/www/views/setup.html	2018-06-24 11:42:53.814241630 +0200
+--- org/www/views/setup.html	2019-05-11 21:13:33.794016297 +0200
++++ mod/www/views/setup.html	2019-05-11 22:35:05.714423128 +0200
 @@ -213,13 +213,12 @@
  										<h2><span data-i18n="SoftwareUpdates"></span>:</h2>
  										<table class="display" id="autoupdatetable" border="0" cellpadding="0" cellspacing="0">

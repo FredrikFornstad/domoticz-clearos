@@ -1,6 +1,6 @@
---- org/scripts/restart_domoticz	2018-06-23 16:18:06.000000000 +0200
-+++ mod/scripts/restart_domoticz	2018-06-23 23:02:57.622368893 +0200
-@@ -1,6 +1,7 @@
+--- org/scripts/restart_domoticz	2019-05-11 21:13:33.794016297 +0200
++++ mod/scripts/restart_domoticz	2019-05-11 22:28:26.277178719 +0200
+@@ -1,6 +1,6 @@
  #!/bin/sh
  
 -sudo service domoticz.sh stop
@@ -9,4 +9,3 @@
  sleep 8
 -sudo service domoticz.sh start
 +sudo service domoticz start
-+

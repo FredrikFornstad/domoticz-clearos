@@ -1,6 +1,6 @@
---- org/CMakeLists.txt	2018-06-23 16:18:06.000000000 +0200
-+++ mod/CMakeLists.txt	2018-06-23 22:26:05.631681268 +0200
-@@ -668,7 +668,7 @@
+--- org/CMakeLists.txt	2019-05-11 21:13:33.795016290 +0200
++++ mod/CMakeLists.txt	2019-05-11 22:19:29.577878503 +0200
+@@ -674,7 +674,7 @@
  # OpenZWave
  # try to find open-zwave, if found, include support
  #
@@ -9,7 +9,7 @@
  if(USE_STATIC_OPENZWAVE)
    find_library(OpenZWave NAMES libopenzwave.a HINTS "../open-zwave-read-only" "../open-zwave-read-only/cpp/build")
    set(OPENZWAVE_LIB ${OpenZWave})
-@@ -788,7 +788,7 @@
+@@ -794,7 +794,7 @@
  
  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -18,7 +18,7 @@
  SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
  
  #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
-@@ -797,7 +797,7 @@
+@@ -803,7 +803,7 @@
  INCLUDE(CPack)
  
  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

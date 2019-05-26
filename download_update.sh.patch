@@ -1,5 +1,5 @@
---- org/scripts/download_update.sh	2018-06-23 16:18:06.000000000 +0200
-+++ mod/scripts/download_update.sh	2018-06-23 22:30:30.821242785 +0200
+--- org/scripts/download_update.sh	2019-05-11 21:13:33.794016297 +0200
++++ mod/scripts/download_update.sh	2019-05-11 22:27:44.493466974 +0200
 @@ -1,50 +1,2 @@
  #!/bin/sh
 -cd $1
