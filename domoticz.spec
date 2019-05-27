@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	4.10717
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -69,7 +69,7 @@ Patch24: boost-1.60-asio-use-future.patch
 
 BuildRequires:	make cmake gcc gcc-c++
 BuildRequires:	openssl-devel git
-BuildRequires:	curl-devel libquadmath-devel
+BuildRequires:	curl-devel
 BuildRequires:	libstdc++-static
 BuildRequires:  libusb-devel systemd-devel
 
@@ -245,6 +245,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-4
+- Removed a duplicate build requirement
+
 * Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-3
 - Changed build requirements to hopefully allow successful build on arm too
 
