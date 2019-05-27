@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	4.10717
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -240,6 +240,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-2
+- Corrected source checksum since upstream re-packaged its release
+
 * Sun May 26 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-1
 - New upstream release
 
