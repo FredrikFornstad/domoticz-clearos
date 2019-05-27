@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	4.10717
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -73,7 +73,12 @@ BuildRequires:	curl-devel libquadmath-devel
 BuildRequires:	libstdc++-static
 BuildRequires:  libusb-devel systemd-devel
 
-BuildRequires: m4 libquadmath-devel
+BuildRequires: m4
+
+%ifarch x86_64
+BuildRequires: libquadmath-devel
+%endif
+
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
@@ -240,6 +245,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-3
+- Changed build requirements to hopefully allow successful build on arm too
+
 * Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-2
 - Corrected source checksum since upstream re-packaged its release
 
