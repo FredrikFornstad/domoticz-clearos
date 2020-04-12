@@ -2,7 +2,7 @@
 
 Name:		domoticz
 Version:	2020.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -65,7 +65,7 @@ BuildRequires: libquadmath-devel
 BuildRequires: libstdc++-devel
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
-BuildRequires: python-devel python34-devel
+BuildRequires: python-devel python3-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
 
@@ -261,6 +261,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun Apr 12 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.1-2
+- Added Buildrequres python3-devel in an attempt to fix a build problem in Koji
+
 * Sun Apr 12 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.1-1
 - New upstream release
 - Updated Boost library to 1.72.0
