@@ -1,14 +1,14 @@
-%global boostver 1_60_0
+%global boostver 1_72_0
 
 Name:		domoticz
-Version:	4.10717
-Release:	4%{?dist}
+Version:	2020.1
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
 URL:		http://www.domoticz.com
 Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
-Source1:	http://downloads.sourceforge.net/boost/boost_%{boostver}.tar.bz2
+Source1:	https://dl.bintray.com/boostorg/release/1.72.0/source/boost_%{boostver}.tar.bz2
 Source2: 	ver.py
 Source3:        libboost_thread.so
 Source4:	readme.txt
@@ -18,56 +18,39 @@ Patch1:		CMakeLists.txt.patch
 Patch2:		download_update.sh.patch
 Patch3:		update_domoticz.patch
 Patch4:		updatedomo.patch
-Patch5:		appversion.default.patch
-Patch6:		setup.html.patch
-Patch7:		index.html.patch
-Patch8:		restart_domoticz.patch
+Patch5:		setup.html.patch
+Patch6:		index.html.patch
+Patch7:		restart_domoticz.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch10: boost-1.50.0-fix-non-utf8-files.patch
 
+# Add a manual page for bjam, based on the on-line documentation:
+# http://www.boost.org/boost-build2/doc/html/bbv2/overview.html
+Patch11: boost-1.48.0-add-bjam-man-page.patch
+
 # https://bugzilla.redhat.com/show_bug.cgi?id=828856
 # https://bugzilla.redhat.com/show_bug.cgi?id=828857
 # https://svn.boost.org/trac/boost/ticket/6701
-Patch11: boost-1.58.0-pool.patch
+Patch12: boost-1.58.0-pool.patch
 
 # https://svn.boost.org/trac/boost/ticket/5637
-Patch12: boost-1.57.0-mpl-print.patch
-
-# https://svn.boost.org/trac/boost/ticket/8870
-Patch13: boost-1.57.0-spirit-unused_typedef.patch
+Patch13: boost-1.57.0-mpl-print.patch
 
 # https://svn.boost.org/trac/boost/ticket/9038
 Patch14: boost-1.58.0-pool-test_linking.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1102667
 Patch15: boost-1.57.0-python-libpython_dep.patch
-Patch16: boost-1.57.0-python-abi_letters.patch
-Patch17: boost-1.55.0-python-test-PyImport_AppendInittab.patch
+Patch16: boost-1.66.0-python-abi_letters.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1190039
-Patch18: boost-1.57.0-build-optflags.patch
-
-# Prevent gcc.jam from setting -m32 or -m64.
-Patch19: boost-1.58.0-address-model.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1262444
-Patch20: boost-1.59-test-fenv.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1349638
-Patch21: boost-1.60-multiprecision.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1358725
-# https://github.com/boostorg/python/pull/59/files
-Patch22: boost-1.60-python-regptr.patch
+Patch17: boost-1.66.0-build-optflags.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1318383
-Patch23: boost-1.60.0-no-rpath.patch
+Patch18: boost-1.66.0-no-rpath.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=1403165
-Patch24: boost-1.60-asio-use-future.patch
-
-BuildRequires:	make cmake gcc gcc-c++
+BuildRequires:	make cmake cmake3 gcc gcc-c++
 BuildRequires:	openssl-devel git
 BuildRequires:	curl-devel
 BuildRequires:	libstdc++-static
@@ -86,7 +69,7 @@ BuildRequires: python-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
 
-Requires: python python34 python34-devel
+Requires: python python34 python34-devel openssl bzip2 tar
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -102,25 +85,18 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
 
 tar -vxjf %{SOURCE1}
 cd boost_%{boostver}
 %patch10 -p1
-%patch11 -p0
-%patch12 -p1
+%patch11 -p1
+%patch12 -p0
 %patch13 -p1
 %patch14 -p1
 %patch15 -p1
 %patch16 -p1
 %patch17 -p1
 %patch18 -p1
-%patch19 -p1
-%patch20 -p2
-%patch21 -p2
-%patch22 -p2
-%patch23 -p0
-%patch24 -p2
 
 cd ..
 
@@ -143,18 +119,22 @@ cd boost_%{boostver}
 # There are many strict aliasing warnings, and it's not feasible to go
 # through them all at this time.
 # There are also lots of noisy but harmless unused local typedef warnings.
-export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs"
+export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-deprecated-declarations"
+export RPM_LD_FLAGS
 
 cat > ./tools/build/src/user-config.jam << "EOF"
 import os ;
 local RPM_OPT_FLAGS = [ os.environ RPM_OPT_FLAGS ] ;
+local RPM_LD_FLAGS = [ os.environ RPM_LD_FLAGS ] ;
 
-using gcc : : : <compileflags>$(RPM_OPT_FLAGS) ;
-
-using python : %{python2_version} : /usr/bin/python2 : /usr/include/python%{python2_version} : : : : ;
-using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}%{python3_abiflags} : : : : %{python3_abiflags} ;
+using gcc : : : <compileflags>$(RPM_OPT_FLAGS) <linkflags>$(RPM_LD_FLAGS) ;
 
 EOF
+
+#using python : %{python2_version} : /usr/bin/python2 : /usr/include/python%{python2_version} : : : : ;
+#using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}%{python3_abiflags} : : : : %{python3_abiflags} ;
+#
+#EOF
 
 ./bootstrap.sh --with-toolset=gcc --with-icu
 
@@ -163,18 +143,23 @@ EOF
 # installation.  Unsure why that is, but all sub-builds need to be
 # built with pch=off to avoid this.
 #
+
+
+# TEXT below IS REMOVED ------------------------------------------------------------------
 # The "python=2.*" bit tells jam that we want to _also_ build 2.*, not
 # just 3.*.  When omitted, it just builds for python 3 twice, once
 # calling the library libboost_python and once libboost_python3.  I
 # assume this is for backward compatibility for apps that are used to
 # linking against -lboost_python, for when 2->3 transition is
 # eventually done.
+# To HERE ------------------------------------------------------------------------------
 
 echo ============================= build serial ==================
 ./b2 -d+2 -q %{?_smp_mflags} \
         --without-mpi --without-graph_parallel --build-dir=serial \
         variant=release threading=multi debug-symbols=on pch=off \
-        python=%{python2_version} stage
+	stage
+#        python=%{python2_version} stage
 
 # See libs/thread/build/Jamfile.v2 for where this file comes from.
 if [ $(find serial -type f -name has_atomic_flag_lockfree \
@@ -187,6 +172,33 @@ fi
 m4 -${DEF}HAS_ATOMIC_FLAG_LOCKFREE -DVERSION=%{boost_ver} \
         %{SOURCE3} > $(basename %{SOURCE3})
 
+# NEW PART HERE--------------------------------------------------------------------------
+# Previously, we built python 2.x and 3.x interfaces simultaneously.
+# However, this does not work once trying to build other Python components
+# such as libboost_numpy.  Therefore, we build for each separately, while
+# minimizing duplicate compilation as much as possible.
+
+cat > python3-config.jam << "EOF"
+import os ;
+local RPM_OPT_FLAGS = [ os.environ RPM_OPT_FLAGS ] ;
+local RPM_LD_FLAGS = [ os.environ RPM_LD_FLAGS ] ;
+
+using gcc : : : <compileflags>$(RPM_OPT_FLAGS) <linkflags>$(RPM_LD_FLAGS) ;
+EOF
+
+cat >> python3-config.jam << EOF
+#using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}${PYTHON3_ABIFLAGS} : : : : ${PYTHON3_ABIFLAGS} ;
+using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{python3_version}%{python3_abiflags} : : : : %{python3_abiflags} ;
+EOF
+
+echo ============================= build serial-py3 ==================
+./b2 -d+2 -q %{?_smp_mflags} \
+	--user-config=./python3-config.jam \
+	--with-python --build-dir=serial-py3 \
+	variant=release threading=multi debug-symbols=on pch=off \
+	python=%{python3_version} stage
+
+
 echo ============================= build Boost.Build ==================
 (cd tools/build
  ./bootstrap.sh --with-toolset=gcc)
@@ -197,7 +209,7 @@ echo ============================= build Boost.Build ==================
 
 cd ..
 
-cmake . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver} -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
+cmake3 . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver} -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
 make
 
 %install
@@ -219,6 +231,10 @@ getent passwd %{name} >/dev/null || useradd -r -g %{name} -d %{_datadir}/%{name}
 if [[ ! -L "/usr/share/domoticz/Config" ]]; then
 rm -rf /usr/share/domoticz/Config $> /dev/null || :
 fi
+mkdir -p /var/domoticz/backup_of_old_domoticz_db &> /dev/null || :
+find /var/domoticz/ -maxdepth 1 -type f \
+-exec tar cvjf /var/domoticz/backup_of_old_domoticz_db/domoticz_db_before_2020_1.tar.bz2 {} + &> /dev/null || :
+
 
 %post
 chown %{name}.webconfig /var/domoticz &> /dev/null || :
@@ -227,14 +243,14 @@ ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
 chmod 775 /usr/share/open-zwave/config &> /dev/null || :
 chown -R root.%{name} /usr/share/open-zwave/config* &> /dev/null || :
 if [ $1 -gt 1 ]; then
-systemctl try-restart domoticz $> /dev/null || :
+systemctl try-restart domoticz &> /dev/null || :
 fi
 
 %preun
 
 %postun
 if [ $1 -eq 0 ] ; then
-rm -rf /usr/share/domoticz $> /dev/null || :
+rm -rf /usr/share/domoticz &> /dev/null || :
 fi
 
 
@@ -245,6 +261,11 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun Apr 12 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.1-1
+- New upstream release
+- Updated Boost library to 1.72.0
+- Various fixes to make it possible to build in ClearOS
+
 * Mon May 27 2019 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 4.10717-4
 - Removed a duplicate build requirement
 

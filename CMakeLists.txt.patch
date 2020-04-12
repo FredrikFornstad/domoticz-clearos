@@ -1,6 +1,15 @@
---- org/CMakeLists.txt	2019-05-11 21:13:33.795016290 +0200
-+++ mod/CMakeLists.txt	2019-05-11 22:19:29.577878503 +0200
-@@ -674,7 +674,7 @@
+--- org/CMakeLists.txt	2020-03-22 15:16:16.000000000 +0100
++++ mod/CMakeLists.txt	2020-03-22 20:39:27.384025947 +0100
+@@ -69,7 +69,7 @@
+   #ADD_DEFINITIONS( -Wfatal-errors -Wformat=2 -Werror=format-security )
+ ENDIF()
+ 
+-option(USE_OPENSSL_STATIC "Link OpenSSL static" YES)
++option(USE_OPENSSL_STATIC "Link OpenSSL static" NO)
+ IF(USE_OPENSSL_STATIC)
+ 	set(OPENSSL_USE_STATIC_LIBS TRUE)
+ ENDIF(USE_OPENSSL_STATIC)
+@@ -620,7 +620,7 @@
  # OpenZWave
  # try to find open-zwave, if found, include support
  #
@@ -9,7 +18,24 @@
  if(USE_STATIC_OPENZWAVE)
    find_library(OpenZWave NAMES libopenzwave.a HINTS "../open-zwave-read-only" "../open-zwave-read-only/cpp/build")
    set(OPENZWAVE_LIB ${OpenZWave})
-@@ -794,7 +794,7 @@
+@@ -674,14 +674,14 @@
+   target_link_libraries(domoticz -lrt -lresolv ${EXECINFO_LIBRARIES})
+ ENDIF()
+ 
+-option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " YES)
++option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " NO)
+ if(USE_PRECOMPILED_HEADER)
+   message(STATUS "Using precompiled headers")
+   target_precompile_headers(domoticz PRIVATE "main/stdafx.h")
+ ENDIF(USE_PRECOMPILED_HEADER)
+ 
+ IF(CMAKE_COMPILER_IS_GNUCXX)
+-  option(USE_STATIC_LIBSTDCXX "Build with static libgcc/libstdc++ libraries" YES)
++  option(USE_STATIC_LIBSTDCXX "Build with static libgcc/libstdc++ libraries" NO)
+   IF(USE_STATIC_LIBSTDCXX)
+     message(STATUS "Using static libgcc/libstdc++")
+     SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -static-libstdc++")
+@@ -713,7 +713,7 @@
  
  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -18,7 +44,7 @@
  SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
  
  #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
-@@ -803,7 +803,7 @@
+@@ -722,7 +722,7 @@
  INCLUDE(CPack)
  
  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
