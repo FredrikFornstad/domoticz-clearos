@@ -1,2 +1,6 @@
-d0c17b2082dad8a8caeed888b7d4c191975e74a2808b5d078305f5327b82442d 2020.1.tar.gz https://github.com/domoticz/domoticz/archive/2020.1.tar.gz
+a02f589daad4eebff1f5e93815c1acd1864cf068f8f5c3185bcdd20207ae395e 2020.2.tar.gz https://github.com/domoticz/domoticz/archive/2020.2.tar.gz
 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722 boost_1_72_0.tar.bz2 https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.bz2
+30930a1e8d4ad839c777ffda75e08804cfae8e05fb7c9fe124b876967a0d5b43 d2d4c74a03036c18d7171993bfaa6e0bea38e07d.zip https://github.com/open-source-parsers/jsoncpp/archive/d2d4c74a03036c18d7171993bfaa6e0bea38e07d.zip
+ca1e4f2741ccc22129c7f180ff09d3c92ec179e1dce245337574bf4a6fae3b3c f5282643091dc1b33546bb8d8b3c23d78fdba231.zip https://github.com/domoticz/minizip/archive/f5282643091dc1b33546bb8d8b3c23d78fdba231.zip
+2cd6e194a21880295e2f0edaefc8798db95a294e5442183135011510bc57d2de cd945465998165e6ec5dbb302cda29723927fe84.zip https://github.com/azadkuh/sqlite-amalgamation/archive/cd945465998165e6ec5dbb302cda29723927fe84.zip
+0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac lua-5.3.5.tar.gz https://www.lua.org/ftp/lua-5.3.5.tar.gz

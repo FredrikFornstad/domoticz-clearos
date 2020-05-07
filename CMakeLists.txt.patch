@@ -1,32 +1,91 @@
---- org/CMakeLists.txt	2020-03-22 15:16:16.000000000 +0100
-+++ mod/CMakeLists.txt	2020-03-22 20:39:27.384025947 +0100
-@@ -69,7 +69,7 @@
-   #ADD_DEFINITIONS( -Wfatal-errors -Wformat=2 -Werror=format-security )
- ENDIF()
+--- org/CMakeLists.txt	2020-04-26 15:49:25.000000000 +0200
++++ mod/CMakeLists.txt	2020-04-30 22:39:58.199286068 +0200
+@@ -1,5 +1,5 @@
+ #set to minimum version that supports clean build
+-cmake_minimum_required(VERSION 3.16.0)
++cmake_minimum_required(VERSION 3.14.0) # 3.16 not needed when skipping precompiled headers
  
--option(USE_OPENSSL_STATIC "Link OpenSSL static" YES)
-+option(USE_OPENSSL_STATIC "Link OpenSSL static" NO)
- IF(USE_OPENSSL_STATIC)
- 	set(OPENSSL_USE_STATIC_LIBS TRUE)
- ENDIF(USE_OPENSSL_STATIC)
-@@ -620,7 +620,7 @@
- # OpenZWave
- # try to find open-zwave, if found, include support
- #
+ project(domoticz)
+ 
+@@ -22,7 +22,7 @@
+ # Bundled libraries
+ option(USE_BUILTIN_JSONCPP "Use builtin JSonCPP" YES)
+ option(USE_BUILTIN_MINIZIP "Use builtin Minizip" YES)
+-option(USE_BUILTIN_MQTT "Use builtin Mosquitto library" YES)
++option(USE_BUILTIN_MQTT "Use builtin Mosquitto library" NO)
+ option(USE_BUILTIN_SQLITE "Use builtin sqlite library" YES)
+ 
+ # Optional dependencies
+@@ -32,13 +32,13 @@
+ option(WITH_LIBUSB "Enable libusb support" YES)
+ 
+ # Link static or shared, external dependencies
+-option(USE_LUA_STATIC "Link LUA static" YES)
++#option(USE_LUA_STATIC "Link LUA static" YES)
+ option(USE_OPENSSL_STATIC "Link OpenSSL static" NO)
+ option(USE_STATIC_BOOST "Build with static BOOST libraries" YES)
 -option(USE_STATIC_OPENZWAVE "Build with static OpenZwave libraries" YES)
 +option(USE_STATIC_OPENZWAVE "Build with static OpenZwave libraries" NO)
- if(USE_STATIC_OPENZWAVE)
-   find_library(OpenZWave NAMES libopenzwave.a HINTS "../open-zwave-read-only" "../open-zwave-read-only/cpp/build")
-   set(OPENZWAVE_LIB ${OpenZWave})
-@@ -674,14 +674,14 @@
-   target_link_libraries(domoticz -lrt -lresolv ${EXECINFO_LIBRARIES})
- ENDIF()
  
+ # Developer-oriented options
 -option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " YES)
 +option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " NO)
- if(USE_PRECOMPILED_HEADER)
-   message(STATUS "Using precompiled headers")
-   target_precompile_headers(domoticz PRIVATE "main/stdafx.h")
+ option(GIT_SUBMODULE "Check submodules during build" ON)
+ 
+ 
+@@ -388,26 +388,16 @@
+ #
+ # LUA
+ #
+-if(USE_LUA_STATIC)
+-  find_library(LUA_LIBRARIES NAMES liblua5.3.a)
+-ELSE(USE_LUA_STATIC)
+-  find_library(LUA_LIBRARIES NAMES liblua5.3.so)
+-ENDIF(USE_LUA_STATIC)
+-find_path(LUA_INCLUDE_DIRS NAMES lua5.3/lua.h)
+-IF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
+-  MESSAGE(STATUS "LUA library found at: ${LUA_LIBRARIES}")
+-  INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIRS}/lua5.3)
+-ELSE(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
+-  # try using find_package()
+-  find_package(Lua "5.3" REQUIRED)
+-  IF(LUA_FOUND)
+-    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
+-    MESSAGE(STATUS "LUA includes found at : ${LUA_INCLUDE_DIR}")
+-    INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR}) 
+-  ELSE(LUA_FOUND)
+-    MESSAGE(FATAL_ERROR "LUA 5.3 not found! use sudo apt-get install liblua5.3-dev")
+-  ENDIF(LUA_FOUND)
+-ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
++message(STATUS "Use builtin lua library" )
++INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/lua/src)
++add_subdirectory (lua)
++get_directory_property (LUA_LIBRARIES DIRECTORY lua DEFINITION LUA_LIBRARIES)
++
++IF(CMAKE_COMPILER_IS_GNUCXX)
++    # Add -rdynamic linker flag for exporting functions which is mandatory to use external lua modules
++    SET_TARGET_PROPERTIES(${_targetName} PROPERTIES ENABLE_EXPORTS ON)
++  ENDIF(CMAKE_COMPILER_IS_GNUCXX)
++
+ 
+ IF(USE_PYTHON)
+   find_package(PythonInterp 3.4)
+@@ -706,13 +696,12 @@
+ IF(OpenZWave)
+   message(STATUS "OpenZWave library found at: ${OpenZWave}")
+   target_link_libraries(domoticz ${OpenZWave})
+-
+   find_path(OPENZWAVE_INCLUDE_DIRS NAMES openzwave/Manager.h)
+   if (OPENZWAVE_INCLUDE_DIRS)
+     IF(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+       include_directories(${OPENZWAVE_INCLUDE_DIRS})
+     ELSE()
+-      include_directories(${OPENZWAVE_INCLUDE_DIRS}/openzwave)
++      include_directories(${OPENZWAVE_INCLUDE_DIRS})
+     ENDIF()
+     message(STATUS "OpenZWave includes found at: ${OPENZWAVE_INCLUDE_DIRS}")
+   else()
+@@ -762,7 +751,7 @@
  ENDIF(USE_PRECOMPILED_HEADER)
  
  IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -35,7 +94,7 @@
    IF(USE_STATIC_LIBSTDCXX)
      message(STATUS "Using static libgcc/libstdc++")
      SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -static-libstdc++")
-@@ -713,7 +713,7 @@
+@@ -792,7 +781,7 @@
  
  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -44,7 +103,7 @@
  SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
  
  #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
-@@ -722,7 +722,7 @@
+@@ -801,7 +790,7 @@
  INCLUDE(CPack)
  
  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

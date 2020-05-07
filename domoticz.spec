@@ -1,8 +1,11 @@
 %global boostver 1_72_0
+%global jsoncpp_ver d2d4c74a03036c18d7171993bfaa6e0bea38e07d
+%global minizip_ver f5282643091dc1b33546bb8d8b3c23d78fdba231
+%global sqlite_amalgamation_ver cd945465998165e6ec5dbb302cda29723927fe84
 
 Name:		domoticz
-Version:	2020.1
-Release:	2%{?dist}
+Version:	2020.2
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -13,6 +16,12 @@ Source2: 	ver.py
 Source3:        libboost_thread.so
 Source4:	readme.txt
 Source5:	run-domoticz
+Source6:	https://github.com/open-source-parsers/jsoncpp/archive/%{jsoncpp_ver}.zip
+Source7:	https://github.com/domoticz/minizip/archive/%{minizip_ver}.zip
+Source8:	https://github.com/azadkuh/sqlite-amalgamation/archive/%{sqlite_amalgamation_ver}.zip
+Source9:	https://www.lua.org/ftp/lua-5.3.5.tar.gz
+Source10:	CMakeLists-lua.txt
+Source11:	CMakeLists-lua-src.txt
 
 Patch1:		CMakeLists.txt.patch
 Patch2:		download_update.sh.patch
@@ -68,8 +77,9 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel python3-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
+BuildRequires: mosquitto-devel cereal-devel
 
-Requires: python python34 python34-devel openssl bzip2 tar
+Requires: python python34 python34-devel openssl bzip2 tar mosquitto cereal-devel
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -85,6 +95,19 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+
+# Ugly way of fixing the submodules that was omitted upstream
+rm -rf extern/*
+unzip -d extern %{SOURCE6}
+unzip -d extern %{SOURCE7}
+unzip -d extern %{SOURCE8}
+mv extern/jsoncpp-%{jsoncpp_ver} extern/jsoncpp
+mv extern/minizip-%{minizip_ver} extern/minizip
+mv extern/sqlite-amalgamation-%{sqlite_amalgamation_ver} extern/sqlite-amalgamation
+mkdir -p lua
+tar -vxzf %{SOURCE9} --directory lua --strip 1
+cp %{SOURCE10} lua/CMakeLists.txt
+cp %{SOURCE11} lua/src/CMakeLists.txt
 
 tar -vxjf %{SOURCE1}
 cd boost_%{boostver}
@@ -233,15 +256,16 @@ rm -rf /usr/share/domoticz/Config $> /dev/null || :
 fi
 mkdir -p /var/domoticz/backup_of_old_domoticz_db &> /dev/null || :
 find /var/domoticz/ -maxdepth 1 -type f \
--exec tar cvjf /var/domoticz/backup_of_old_domoticz_db/domoticz_db_before_2020_1.tar.bz2 {} + &> /dev/null || :
+-exec tar cvjf /var/domoticz/backup_of_old_domoticz_db/domoticz_db_before_%{version}-%{release}.tar.bz2 {} + &> /dev/null || :
 
 
 %post
 chown %{name}.webconfig /var/domoticz &> /dev/null || :
 chmod 775 /var/domoticz &> /dev/null || :
-ln -sf /usr/share/open-zwave/config /usr/share/domoticz/Config &> /dev/null || :
-chmod 775 /usr/share/open-zwave/config &> /dev/null || :
-chown -R root.%{name} /usr/share/open-zwave/config* &> /dev/null || :
+unlink /usr/share/domoticz/Config &> /dev/null || :
+ln -sf /usr/share/openzwave/config /usr/share/domoticz/Config &> /dev/null || :
+chmod 775 /usr/share/openzwave/config &> /dev/null || :
+chown -R root.%{name} /usr/share/openzwave/config* &> /dev/null || :
 if [ $1 -gt 1 ]; then
 systemctl try-restart domoticz &> /dev/null || :
 fi
@@ -261,6 +285,10 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Thu Apr 30 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2-1
+- New upstream release
+- Made adjustments for change to submodules in upstream
+
 * Sun Apr 12 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.1-2
 - Added Buildrequres python3-devel in an attempt to fix a build problem in Koji
 
