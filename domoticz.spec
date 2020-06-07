@@ -5,7 +5,7 @@
 
 Name:		domoticz
 Version:	2020.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -59,6 +59,16 @@ Patch17: boost-1.66.0-build-optflags.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1318383
 Patch18: boost-1.66.0-no-rpath.patch
 
+
+# Fix for receiving signal strength for rtl433 under domoticz 2020.2 
+# Remove these patches for domoticz 2020.3 and higher
+patch20: mainworker.cpp.patch
+patch21: DomoticzHardware.cpp.patch
+patch22: DomoticzHardware.h.patch
+patch23: hardwaretypes.h.patch
+patch24: Rtl433.cpp.patch
+patch25: mainworker.h.patch
+
 BuildRequires:	make cmake cmake3 gcc gcc-c++
 BuildRequires:	openssl-devel git
 BuildRequires:	curl-devel
@@ -95,6 +105,13 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+
+%patch20 -p1
+%patch21 -p1
+%patch22 -p1
+%patch23 -p1
+%patch24 -p1
+%patch25 -p1
 
 # Ugly way of fixing the submodules that was omitted upstream
 rm -rf extern/*
@@ -285,6 +302,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sun Jun 7 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2-2
+- Backported upstream patches for additional display of rssi and battery level
+
 * Thu Apr 30 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2-1
 - New upstream release
 - Made adjustments for change to submodules in upstream
