@@ -1,11 +1,11 @@
---- org/www/views/setup.html	2019-05-11 21:13:33.794016297 +0200
-+++ mod/www/views/setup.html	2019-05-11 22:35:05.714423128 +0200
-@@ -213,13 +213,12 @@
+--- org/www/views/setup.html	2021-04-07 14:02:30.000000000 +0200
++++ mod/www/views/setup.html	2021-04-09 12:42:48.833603719 +0200
+@@ -210,13 +210,12 @@
  										<h2><span data-i18n="SoftwareUpdates"></span>:</h2>
  										<table class="display" id="autoupdatetable" border="0" cellpadding="0" cellspacing="0">
  											<tr>
--												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"/> <label for="checkforupdates" data-i18n="CheckForSoftwareUpdates"></label></td>
-+												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"/> <label for="checkforupdates" > (Disabled in ClearOS)</label></td>
+-												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"> <label for="checkforupdates" data-i18n="CheckForSoftwareUpdates"></label></td>
++												<td colspan="2"><input type="checkbox" id="checkforupdates" name="checkforupdates"> <label for="checkforupdates" > (Disabled in ClearOS)</label></td>
  											</tr>
  											<tr>
  												<td align="right" style="width:130px"><label><span data-i18n="Release Channel">Release Channel</span>: </label></td>

@@ -1,0 +1,8 @@
+--- org/History.txt	2021-04-07 14:02:30.000000000 +0200
++++ mod/History.txt	2021-04-14 11:25:18.332931517 +0200
+@@ -1,4 +1,4 @@
+-Version 2021.xxxxx (xxxxx)
++Version 2020.2.13165 (April 14th 2021)
+ - Implemented: Added option to set loglevel per hardware device
+ - Implemented: Added optional parameter 'level' to addlogmessage JSON
+ - Implemented: AirconWithMe wifi module

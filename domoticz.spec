@@ -1,16 +1,19 @@
 %global boostver 1_72_0
-%global jsoncpp_ver d2d4c74a03036c18d7171993bfaa6e0bea38e07d
-%global minizip_ver f5282643091dc1b33546bb8d8b3c23d78fdba231
-%global sqlite_amalgamation_ver cd945465998165e6ec5dbb302cda29723927fe84
+%global jsoncpp_ver 2a6e163b02ac5044d74a44ed15f8aa7af687aea5
+%global minizip_ver 78eb93e8e0ba228f37b197d2022d66b73856c9ff
+%global sqlite_amalgamation_ver afb008e9d7185f84c23a590dd06538fb9b2f1e19
+%global fmt_ver a1c6bfd77b409f21e234cc7042795ca4d31fa020
 
 Name:		domoticz
-Version:	2020.2
-Release:	2%{?dist}
+Version:	2020.2.13165
+Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
 URL:		http://www.domoticz.com
-Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
+# Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
+Source0:	https://github.com/domoticz/domoticz/archive/41b1ae7f68b11d6e71005ad453d4ae85978c068f.zip
+
 Source1:	https://dl.bintray.com/boostorg/release/1.72.0/source/boost_%{boostver}.tar.bz2
 Source2: 	ver.py
 Source3:        libboost_thread.so
@@ -19,9 +22,10 @@ Source5:	run-domoticz
 Source6:	https://github.com/open-source-parsers/jsoncpp/archive/%{jsoncpp_ver}.zip
 Source7:	https://github.com/domoticz/minizip/archive/%{minizip_ver}.zip
 Source8:	https://github.com/azadkuh/sqlite-amalgamation/archive/%{sqlite_amalgamation_ver}.zip
-Source9:	https://www.lua.org/ftp/lua-5.3.5.tar.gz
+Source9:	https://www.lua.org/ftp/lua-5.4.3.tar.gz
 Source10:	CMakeLists-lua.txt
 Source11:	CMakeLists-lua-src.txt
+Source12:	https://github.com/fmtlib/fmt/archive/%{fmt_ver}.zip
 
 Patch1:		CMakeLists.txt.patch
 Patch2:		download_update.sh.patch
@@ -30,6 +34,7 @@ Patch4:		updatedomo.patch
 Patch5:		setup.html.patch
 Patch6:		index.html.patch
 Patch7:		restart_domoticz.patch
+Patch8:		History.txt.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch10: boost-1.50.0-fix-non-utf8-files.patch
@@ -60,19 +65,10 @@ Patch17: boost-1.66.0-build-optflags.patch
 Patch18: boost-1.66.0-no-rpath.patch
 
 
-# Fix for receiving signal strength for rtl433 under domoticz 2020.2 
-# Remove these patches for domoticz 2020.3 and higher
-patch20: mainworker.cpp.patch
-patch21: DomoticzHardware.cpp.patch
-patch22: DomoticzHardware.h.patch
-patch23: hardwaretypes.h.patch
-patch24: Rtl433.cpp.patch
-patch25: mainworker.h.patch
-
 BuildRequires:	make cmake cmake3 gcc gcc-c++
-BuildRequires:	openssl-devel git
+BuildRequires:	openssl11-devel git
 BuildRequires:	curl-devel
-BuildRequires:	libstdc++-static
+BuildRequires:	devtoolset-9 devtoolset-9-build
 BuildRequires:  libusb-devel systemd-devel
 
 BuildRequires: m4
@@ -89,7 +85,7 @@ BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
 BuildRequires: mosquitto-devel cereal-devel
 
-Requires: python python34 python34-devel openssl bzip2 tar mosquitto cereal-devel
+Requires: python python34 python34-devel bzip2 tar mosquitto cereal-devel openssl11-libs devtoolset-9
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -97,7 +93,8 @@ Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Elect
 Notifications/Alerts can be sent to any mobile device.
 
 %prep
-%setup -q -n %{name}-%{version}
+# %setup -q -n %{name}-%{version}
+%setup -q -n domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -105,22 +102,20 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
-%patch20 -p1
-%patch21 -p1
-%patch22 -p1
-%patch23 -p1
-%patch24 -p1
-%patch25 -p1
 
 # Ugly way of fixing the submodules that was omitted upstream
 rm -rf extern/*
 unzip -d extern %{SOURCE6}
 unzip -d extern %{SOURCE7}
 unzip -d extern %{SOURCE8}
+unzip -d extern %{SOURCE12}
+
 mv extern/jsoncpp-%{jsoncpp_ver} extern/jsoncpp
 mv extern/minizip-%{minizip_ver} extern/minizip
 mv extern/sqlite-amalgamation-%{sqlite_amalgamation_ver} extern/sqlite-amalgamation
+mv extern/fmt-%{fmt_ver} extern/fmtlib
 mkdir -p lua
 tar -vxzf %{SOURCE9} --directory lua --strip 1
 cp %{SOURCE10} lua/CMakeLists.txt
@@ -142,6 +137,9 @@ cd ..
 
 %build
 
+%{?scl:scl enable %scl - << \EOFF}
+# this is a gcc-9 enabled shell
+
 %global python2_version %(/usr/bin/python2 %{SOURCE2})
 %global python3_version %(/usr/bin/python3 %{SOURCE2})
 %global python3_abiflags %(/usr/bin/python3-config --abiflags)
@@ -159,8 +157,12 @@ cd boost_%{boostver}
 # There are many strict aliasing warnings, and it's not feasible to go
 # through them all at this time.
 # There are also lots of noisy but harmless unused local typedef warnings.
-export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-deprecated-declarations"
-export RPM_LD_FLAGS
+
+export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-deprecated-declarations $(pkg-config --cflags openssl11)"
+export RPM_LD_FLAGS="$RPM_LD_FLAGS $(pkg-config --libs openssl11)"
+
+export CFLAGS="$CFLAGS $(pkg-config --cflags openssl11)"
+export LDFLAGS="$LDFLAGS $(pkg-config --libs openssl11)"
 
 cat > ./tools/build/src/user-config.jam << "EOF"
 import os ;
@@ -249,8 +251,13 @@ echo ============================= build Boost.Build ==================
 
 cd ..
 
-cmake3 . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver} -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
+#cmake3 . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver} -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
+cmake3 . -DOPENSSL_ROOT_DIR=%{_includedir}/openssl11 -DOPENSSL_SSL_LIBRARY=%{_libdir}/openssl11/libssl.so -DOPENSSL_CRYPTO_LIBRARY=%{_libdir}/openssl11/libcrypto.so \
+-DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f/boost_%{boostver}  -DBOOST_LIBRARYDIR=%{_builddir}/domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f/boost_%{boostver}/stage/lib
 make
+
+# End of GCC-9 enabled section
+%{?scl:EOFF}
 
 %install
 %make_install
@@ -302,6 +309,14 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Wed Apr 14 2021 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2.13165-1
+- New upstream beta release
+- Added new submodule fmtlib
+
+* Fri Apr 9 2021 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2.13150-1
+- New upstream beta release, updated submodules
+- Enabled SCL and gcc-9 in the build section
+
 * Sun Jun 7 2020 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2-2
 - Backported upstream patches for additional display of rssi and battery level
 

@@ -1,12 +1,5 @@
---- org/CMakeLists.txt	2020-04-26 15:49:25.000000000 +0200
-+++ mod/CMakeLists.txt	2020-04-30 22:39:58.199286068 +0200
-@@ -1,5 +1,5 @@
- #set to minimum version that supports clean build
--cmake_minimum_required(VERSION 3.16.0)
-+cmake_minimum_required(VERSION 3.14.0) # 3.16 not needed when skipping precompiled headers
- 
- project(domoticz)
- 
+--- org/CMakeLists.txt	2021-04-07 14:02:30.000000000 +0200
++++ mod/CMakeLists.txt	2021-04-10 12:35:03.607366126 +0200
 @@ -22,7 +22,7 @@
  # Bundled libraries
  option(USE_BUILTIN_JSONCPP "Use builtin JSonCPP" YES)
@@ -16,7 +9,7 @@
  option(USE_BUILTIN_SQLITE "Use builtin sqlite library" YES)
  
  # Optional dependencies
-@@ -32,13 +32,13 @@
+@@ -32,15 +32,18 @@
  option(WITH_LIBUSB "Enable libusb support" YES)
  
  # Link static or shared, external dependencies
@@ -28,16 +21,20 @@
 +option(USE_STATIC_OPENZWAVE "Build with static OpenZwave libraries" NO)
  
  # Developer-oriented options
--option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " YES)
-+option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " NO)
+ option(USE_PRECOMPILED_HEADER "Use precompiled header feature to speed up build time " YES)
  option(GIT_SUBMODULE "Check submodules during build" ON)
  
++### Disable standard openssl 1.0
++set(CMAKE_SYSTEM_IGNORE_PATH "/usr/lib64/openssl;/usr/include/openssl")
++set(CMAKE_IGNORE_PATH "/usr/lib64/openssl;/usr/include/openssl")
  
-@@ -388,26 +388,16 @@
+ ### COMPILER SETTINGS
+ #
+@@ -392,26 +395,37 @@
  #
  # LUA
  #
--if(USE_LUA_STATIC)
+-IF(USE_LUA_STATIC)
 -  find_library(LUA_LIBRARIES NAMES liblua5.3.a)
 -ELSE(USE_LUA_STATIC)
 -  find_library(LUA_LIBRARIES NAMES liblua5.3.so)
@@ -47,7 +44,17 @@
 -  MESSAGE(STATUS "LUA library found at: ${LUA_LIBRARIES}")
 -  INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIRS}/lua5.3)
 -ELSE(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
--  # try using find_package()
++#IF(USE_LUA_STATIC)
++#  find_library(LUA_LIBRARIES NAMES liblua5.3.a)
++#ELSE(USE_LUA_STATIC)
++#  find_library(LUA_LIBRARIES NAMES liblua5.3.so)
++#ENDIF(USE_LUA_STATIC)
++#find_path(LUA_INCLUDE_DIRS NAMES lua5.3/lua.h)
++#IF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
++#  MESSAGE(STATUS "LUA library found at: ${LUA_LIBRARIES}")
++#  INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIRS}/lua5.3)
++#ELSE(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
+   # try using find_package()
 -  find_package(Lua "5.3" REQUIRED)
 -  IF(LUA_FOUND)
 -    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
@@ -57,6 +64,16 @@
 -    MESSAGE(FATAL_ERROR "LUA 5.3 not found! use sudo apt-get install liblua5.3-dev")
 -  ENDIF(LUA_FOUND)
 -ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
++#  find_package(Lua "5.3" REQUIRED)
++#  IF(LUA_FOUND)
++#    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
++#    MESSAGE(STATUS "LUA includes found at : ${LUA_INCLUDE_DIR}")
++#    INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR}) 
++#  ELSE(LUA_FOUND)
++#    MESSAGE(FATAL_ERROR "LUA 5.3 not found! use sudo apt-get install liblua5.3-dev")
++#  ENDIF(LUA_FOUND)
++#ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
++
 +message(STATUS "Use builtin lua library" )
 +INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/lua/src)
 +add_subdirectory (lua)
@@ -70,22 +87,15 @@
  
  IF(USE_PYTHON)
    find_package(PythonInterp 3.4)
-@@ -706,13 +696,12 @@
- IF(OpenZWave)
-   message(STATUS "OpenZWave library found at: ${OpenZWave}")
-   target_link_libraries(domoticz ${OpenZWave})
--
-   find_path(OPENZWAVE_INCLUDE_DIRS NAMES openzwave/Manager.h)
-   if (OPENZWAVE_INCLUDE_DIRS)
-     IF(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-       include_directories(${OPENZWAVE_INCLUDE_DIRS})
-     ELSE()
--      include_directories(${OPENZWAVE_INCLUDE_DIRS}/openzwave)
-+      include_directories(${OPENZWAVE_INCLUDE_DIRS})
-     ENDIF()
-     message(STATUS "OpenZWave includes found at: ${OPENZWAVE_INCLUDE_DIRS}")
-   else()
-@@ -762,7 +751,7 @@
+@@ -580,6 +594,7 @@
+ #
+ # Find MD5/RMD160/SHA library
+ #
++
+ IF(USE_OPENSSL_STATIC)
+   set(OPENSSL_USE_STATIC_LIBS TRUE)
+ ENDIF(USE_OPENSSL_STATIC)
+@@ -757,7 +772,7 @@
  ENDIF(USE_PRECOMPILED_HEADER)
  
  IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -94,7 +104,7 @@
    IF(USE_STATIC_LIBSTDCXX)
      message(STATUS "Using static libgcc/libstdc++")
      SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -static-libstdc++")
-@@ -792,7 +781,7 @@
+@@ -787,7 +802,7 @@
  
  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -103,7 +113,7 @@
  SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
  
  #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
-@@ -801,7 +790,7 @@
+@@ -796,7 +811,7 @@
  INCLUDE(CPack)
  
  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
