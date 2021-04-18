@@ -5,14 +5,14 @@
 %global fmt_ver a1c6bfd77b409f21e234cc7042795ca4d31fa020
 
 Name:		domoticz
-Version:	2020.2.13165
+Version:	2021.1
 Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
 URL:		http://www.domoticz.com
-# Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
-Source0:	https://github.com/domoticz/domoticz/archive/41b1ae7f68b11d6e71005ad453d4ae85978c068f.zip
+Source0:	https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
+#Source0:	https://github.com/domoticz/domoticz/archive/41b1ae7f68b11d6e71005ad453d4ae85978c068f.zip
 
 Source1:	https://dl.bintray.com/boostorg/release/1.72.0/source/boost_%{boostver}.tar.bz2
 Source2: 	ver.py
@@ -34,7 +34,7 @@ Patch4:		updatedomo.patch
 Patch5:		setup.html.patch
 Patch6:		index.html.patch
 Patch7:		restart_domoticz.patch
-Patch8:		History.txt.patch
+#Patch8:	History.txt.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch10: boost-1.50.0-fix-non-utf8-files.patch
@@ -65,7 +65,7 @@ Patch17: boost-1.66.0-build-optflags.patch
 Patch18: boost-1.66.0-no-rpath.patch
 
 
-BuildRequires:	make cmake cmake3 gcc gcc-c++
+BuildRequires:	make cmake3
 BuildRequires:	openssl11-devel git
 BuildRequires:	curl-devel
 BuildRequires:	devtoolset-9 devtoolset-9-build
@@ -77,7 +77,7 @@ BuildRequires: m4
 BuildRequires: libquadmath-devel
 %endif
 
-BuildRequires: libstdc++-devel
+# BuildRequires: libstdc++-devel
 BuildRequires: bzip2-devel
 BuildRequires: zlib-devel
 BuildRequires: python-devel python3-devel python34-devel
@@ -85,7 +85,7 @@ BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
 BuildRequires: mosquitto-devel cereal-devel
 
-Requires: python python34 python34-devel bzip2 tar mosquitto cereal-devel openssl11-libs devtoolset-9
+Requires: python python34 python34-devel bzip2 tar mosquitto cereal-devel openssl11-libs
 
 %description
 Domoticz is a Home Automation System that lets you monitor and configure various devices like:
@@ -93,8 +93,8 @@ Lights, Switches, various sensors/meters like Temperature, Rain, Wind, UV, Elect
 Notifications/Alerts can be sent to any mobile device.
 
 %prep
-# %setup -q -n %{name}-%{version}
-%setup -q -n domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f
+%setup -q -n %{name}-%{version}
+#%setup -q -n domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -102,7 +102,7 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-%patch8 -p1
+#%patch8 -p1
 
 
 # Ugly way of fixing the submodules that was omitted upstream
@@ -253,7 +253,7 @@ cd ..
 
 #cmake3 . -DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver} -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
 cmake3 . -DOPENSSL_ROOT_DIR=%{_includedir}/openssl11 -DOPENSSL_SSL_LIBRARY=%{_libdir}/openssl11/libssl.so -DOPENSSL_CRYPTO_LIBRARY=%{_libdir}/openssl11/libcrypto.so \
--DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f/boost_%{boostver}  -DBOOST_LIBRARYDIR=%{_builddir}/domoticz-41b1ae7f68b11d6e71005ad453d4ae85978c068f/boost_%{boostver}/stage/lib
+-DCMAKE_BUILD_TYPE=Release -DBOOST_ROOT:PATH=%{_builddir}/%{name}-%{version}/boost_%{boostver}  -DBOOST_LIBRARYDIR=%{_builddir}/%{name}-%{version}/boost_%{boostver}/stage/lib
 make
 
 # End of GCC-9 enabled section
@@ -309,6 +309,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Sat Apr 17 2021 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2021.1-1
+- New upstream release
+
 * Wed Apr 14 2021 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2020.2.13165-1
 - New upstream beta release
 - Added new submodule fmtlib
