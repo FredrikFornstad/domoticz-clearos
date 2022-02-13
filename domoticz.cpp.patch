@@ -1,0 +1,35 @@
+--- org/main/domoticz.cpp	2022-01-31 09:34:32.000000000 +0100
++++ mod/main/domoticz.cpp	2022-02-05 10:03:31.141482044 +0100
+@@ -887,11 +887,12 @@
+ 		}
+ 		if (cmdLine.HasSwitch("-sslpass"))
+ 		{
+-			if (cmdLine.GetArgumentCount("-sslpass") != 1)
++			if (cmdLine.GetArgumentCount("-sslpass") > 1)
+ 			{
+ 				_log.Log(LOG_ERROR, "Please specify a passphrase to access to your server private key in certificate file");
+ 				return 1;
+ 			}
++			if (cmdLine.GetArgumentCount("-sslpass") == 1)
+ 			secure_webserver_settings.private_key_pass_phrase = cmdLine.GetSafeArgument("-sslpass", 0, "");
+ 		}
+ 		if (cmdLine.HasSwitch("-sslmethod"))
+@@ -1010,14 +1011,17 @@
+ 	if (!bUseConfigFile) {
+ 		if (cmdLine.HasSwitch("-webroot"))
+ 		{
+-			if (cmdLine.GetArgumentCount("-webroot") != 1)
++			if (cmdLine.GetArgumentCount("-webroot") > 1)
+ 			{
+ 				_log.Log(LOG_ERROR, "Please specify a web root path");
+ 				return 1;
+ 			}
++			if (cmdLine.GetArgumentCount("-dbase") == 1)
++			{
+ 			std::string szroot = cmdLine.GetSafeArgument("-webroot", 0, "");
+ 			if (!szroot.empty())
+ 				szWebRoot = szroot;
++			}
+ 		}
+ 		if (cmdLine.HasSwitch("-noupdates"))
+ 		{

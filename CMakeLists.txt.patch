@@ -1,15 +1,15 @@
---- org/CMakeLists.txt	2021-04-17 17:50:55.000000000 +0200
-+++ mod/CMakeLists.txt	2021-04-18 13:18:10.959439298 +0200
+--- org/CMakeLists.txt	2022-01-31 09:34:32.000000000 +0100
++++ mod/CMakeLists.txt	2022-02-04 21:09:02.021579972 +0100
 @@ -22,7 +22,7 @@
  # Bundled libraries
  option(USE_BUILTIN_JSONCPP "Use builtin JSonCPP" YES)
  option(USE_BUILTIN_MINIZIP "Use builtin Minizip" YES)
 -option(USE_BUILTIN_MQTT "Use builtin Mosquitto library" YES)
 +option(USE_BUILTIN_MQTT "Use builtin Mosquitto library" NO)
- option(USE_BUILTIN_SQLITE "Use builtin sqlite library" YES)
- option(USE_BUILTIN_LIBFMT "Use builtin FMT library" YES)
+ option(USE_BUILTIN_SQLITE "Use builtin sqlite library" NO)
  
-@@ -33,15 +33,19 @@
+ # Optional dependencies
+@@ -32,15 +32,18 @@
  option(WITH_LIBUSB "Enable libusb support" YES)
  
  # Link static or shared, external dependencies
@@ -27,11 +27,10 @@
 +### Disable standard openssl 1.0
 +set(CMAKE_SYSTEM_IGNORE_PATH "/usr/lib64/openssl;/usr/include/openssl")
 +set(CMAKE_IGNORE_PATH "/usr/lib64/openssl;/usr/include/openssl")
-+
  
  ### COMPILER SETTINGS
  #
-@@ -396,26 +400,36 @@
+@@ -399,26 +402,38 @@
  #
  # LUA
  #
@@ -45,16 +44,6 @@
 -  MESSAGE(STATUS "LUA library found at: ${LUA_LIBRARIES}")
 -  INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIRS}/lua5.3)
 -ELSE(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
--  # try using find_package()
--  find_package(Lua "5.3" REQUIRED)
--  IF(LUA_FOUND)
--    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
--    MESSAGE(STATUS "LUA includes found at : ${LUA_INCLUDE_DIR}")
--    INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR}) 
--  ELSE(LUA_FOUND)
--    MESSAGE(FATAL_ERROR "LUA 5.3 not found! use sudo apt-get install liblua5.3-dev")
--  ENDIF(LUA_FOUND)
--ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
 +#IF(USE_LUA_STATIC)
 +#  find_library(LUA_LIBRARIES NAMES liblua5.3.a)
 +#ELSE(USE_LUA_STATIC)
@@ -65,7 +54,16 @@
 +#  MESSAGE(STATUS "LUA library found at: ${LUA_LIBRARIES}")
 +#  INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIRS}/lua5.3)
 +#ELSE(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
-+#  # try using find_package()
+   # try using find_package()
+-  find_package(Lua "5.3" REQUIRED)
+-  IF(LUA_FOUND)
+-    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
+-    MESSAGE(STATUS "LUA includes found at : ${LUA_INCLUDE_DIR}")
+-    INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR}) 
+-  ELSE(LUA_FOUND)
+-    MESSAGE(FATAL_ERROR "LUA 5.3 not found! use sudo apt-get install liblua5.3-dev")
+-  ENDIF(LUA_FOUND)
+-ENDIF(LUA_LIBRARIES AND LUA_INCLUDE_DIRS)
 +#  find_package(Lua "5.3" REQUIRED)
 +#  IF(LUA_FOUND)
 +#    MESSAGE(STATUS "LUA library found at  : ${LUA_LIBRARIES}")
@@ -81,14 +79,16 @@
 +add_subdirectory (lua)
 +get_directory_property (LUA_LIBRARIES DIRECTORY lua DEFINITION LUA_LIBRARIES)
 +
++
 +IF(CMAKE_COMPILER_IS_GNUCXX)
 +    # Add -rdynamic linker flag for exporting functions which is mandatory to use external lua mod$
 +    SET_TARGET_PROPERTIES(${_targetName} PROPERTIES ENABLE_EXPORTS ON)
 +  ENDIF(CMAKE_COMPILER_IS_GNUCXX)
++
  
  IF(USE_PYTHON)
-   find_package(PythonInterp 3.4)
-@@ -810,7 +824,7 @@
+   find_package(Python3 3.4 COMPONENTS Development)
+@@ -793,7 +808,7 @@
  
  SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${domoticz}-dev")
  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -97,7 +97,7 @@
  SET(CPACK_PACKAGE_EXECUTABLES "domoticz;Home Automation System (Domotica).")
  
  #set(CPACK_DEB_COMPONENT_INSTALL TRUE)
-@@ -819,7 +833,7 @@
+@@ -802,7 +817,7 @@
  INCLUDE(CPack)
  
  IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

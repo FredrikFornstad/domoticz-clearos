@@ -5,7 +5,7 @@
 %global fmt_ver a1c6bfd77b409f21e234cc7042795ca4d31fa020
 
 Name:		domoticz
-Version:	2021.1
+Version:	2022.1
 Release:	1%{?dist}
 Summary:	Domoticz Home Automation System
 
@@ -34,7 +34,9 @@ Patch4:		updatedomo.patch
 Patch5:		setup.html.patch
 Patch6:		index.html.patch
 Patch7:		restart_domoticz.patch
+Patch8:		SQLHelper.cpp.patch
 #Patch8:	History.txt.patch
+Patch9:		domoticz.cpp.patch
 
 # https://svn.boost.org/trac/boost/ticket/6150
 Patch10: boost-1.50.0-fix-non-utf8-files.patch
@@ -102,7 +104,8 @@ Notifications/Alerts can be sent to any mobile device.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-#%patch8 -p1
+%patch8 -p1
+%patch9 -p1
 
 
 # Ugly way of fixing the submodules that was omitted upstream
@@ -309,6 +312,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Fri Feb 4 2022 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2022.1
+- New upstream release
+
 * Sat Apr 17 2021 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2021.1-1
 - New upstream release
 
