@@ -6,7 +6,7 @@
 
 Name:		domoticz
 Version:	2022.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Domoticz Home Automation System
 
 License:	GNU GPL 3
@@ -85,7 +85,7 @@ BuildRequires: zlib-devel
 BuildRequires: python-devel python3-devel python34-devel
 BuildRequires: libicu-devel
 BuildRequires: libopenzwave-devel telldus-core-devel
-BuildRequires: mosquitto-devel cereal-devel
+BuildRequires: mosquitto-devel cereal-devel sqlite-devel
 
 Requires: python python34 python34-devel bzip2 tar mosquitto cereal-devel openssl11-libs
 
@@ -312,6 +312,9 @@ fi
 %attr(-,%{name},%{name}) %{_datadir}/%{name}
 
 %changelog
+* Fri Mar 25 2022 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2022.1-2
+- Added sqlite-devel as build req to enable mock builds
+
 * Fri Feb 4 2022 Fredrik Fornstad <fredrik.fornstad@gmail.com> - 2022.1
 - New upstream release
 
